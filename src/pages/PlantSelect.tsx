@@ -7,10 +7,12 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { EnviromentButton } from '../components/EnviromentButton';
+import { useNavigation } from '@react-navigation/core';
 
 import { Header } from '../components/Header';
-import { PlantCardPrimary } from '../components/PlantCardPrimary';
 import { Load } from '../components/Load';
+import { PlantProps } from '../libs/storage';
+import { PlantCardPrimary } from '../components/PlantCardSecondary';
 
 import api from '../services/api';
 
@@ -22,28 +24,17 @@ interface EnviromentProps {
   title: string;
 }
 
-interface PlantProps {
-  id: string;
-  name: string;
-  about: string;
-  water_tips: string;
-  photo: string;
-  environments: [string];
-  frequency: {
-    times: number;
-    repeat_every: string;
-  }
-}
-
 export function PlantSelect() {
   const [enviroments, setEnviroments] = useState<EnviromentProps[]>([]);
   const [plants, setPlants] = useState<PlantProps[]>([]);
   const [filteredPlants, setFilteredPlants] = useState<PlantProps[]>([]);
   const [enviromentSelected, setEnviromentSelected] = useState('all');
   const [loading, setLoadin] = useState(true);
+  
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [loadedAll, setLoadedAll] = useState(false);
+
+  const navigation = useNavigation();
 
   function handleEnviromentSelected(evironment: string) {
     setEnviromentSelected(evironment);
@@ -65,6 +56,10 @@ export function PlantSelect() {
     setLoadingMore(true);
     setPage(oldValue => oldValue + 1);
     fetchPlants();
+  }
+
+  function handlePlantSelect(plant: PlantProps) {
+    navigation.navigate('PlantSave', { plant });
   }
 
   async function fetchPlants() {
@@ -124,6 +119,7 @@ export function PlantSelect() {
       <View>
         <FlatList 
           data={enviroments}
+          keyExtractor={(item) => String(item.key)}
           renderItem={({ item }) => (
             <EnviromentButton 
               title={item.title}
@@ -139,8 +135,12 @@ export function PlantSelect() {
       <View style={styles.plants}>
         <FlatList 
           data={filteredPlants}
+          keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
-            <PlantCardPrimary data ={item} />
+            <PlantCardPrimary 
+              data ={item} 
+              onPress={() => handlePlantSelect(item)}
+            />
           )}
           showsVerticalScrollIndicator={false}
           numColumns={2}
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
 })
 
-//TODO FlatList, faz uma lista de elementos
+//TODO FlatList, faz uma lista de elementos ela espera que seja passado qual é o id e todo elemento é ideal que tenha um id
 // horizontal por padrão a lista está na vertical, com esse comando ela fica na horizontal
 // showsHorizontalScrollIndicator={false} retira a barra de rolagem dos itens
 

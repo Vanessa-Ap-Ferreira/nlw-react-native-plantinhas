@@ -7,10 +7,11 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Platform,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native';
-
 import { useNavigation } from '@react-navigation/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Button } from '../components/Button';
 
@@ -39,8 +40,22 @@ export function UserIdentification(){
     setName(value);
   }
 
-  function handleSubmit(){
-    navagation.navigate('Confirmation');
+  async function handleSubmit(){
+    if(!name)
+      return Alert.alert('Me diz como chamar você 😢')
+    
+    try{
+      await AsyncStorage.setItem('@plantmaneger:user', name)
+      navagation.navigate('Confirmation', {
+        title: 'Prontinho',
+        subtitle: 'Agora vamos começar a cuidar da sua plantinha com muito cuidado.',
+        buttonTitle: 'Começar',
+        icon: 'smile',
+        nextScreen: 'PlantSelect',
+      });
+    }catch{
+      Alert.alert('Não foi possível salvar seu nome. 😢')
+    }
   }
 
   return (
@@ -150,3 +165,10 @@ const styles = StyleSheet.create({
 
 //TODO usar TouchableWithoutFeedback, melhora a usabilidade do usuário, fazendo que quando clicado
 // em qq lugar fora do Input a teclado saia da tela
+
+//TODO AsyncStorage é responsável por armazenar dados no próprio dispositivo do usuário
+// expo install @react-native-async-storage/async-storage
+// boa prática ao salvar usuário (@plantmaneger:user) sempre começar com @ e o nome do app
+// depois o que vc quer salvar nesse app, no caso quero salvar o nome do usuário do app plantmaneger
+// desta forma vc evita que de conflitos com outros app do usuário que também estão salvando nome 
+// então sempre comece com @ + nome do app + : + o que vc quer salvar
