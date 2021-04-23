@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/core';
 import { Header } from '../components/Header';
 import { Load } from '../components/Load';
 import { PlantProps } from '../libs/storage';
-import { PlantCardPrimary } from '../components/PlantCardSecondary';
+import { PlantCardPrimary } from '../components/PlantCardPrimary';
 
 import api from '../services/api';
 
@@ -105,6 +105,7 @@ export function PlantSelect() {
 
   if(loading)
     return <Load />
+    
   return(
     <View style={styles.container}>
       <View style={styles.header}>
